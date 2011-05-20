@@ -2,7 +2,7 @@
 # version 2.5 (4/4/11)
 # original author : Relliktsohg
 # continued contributions: Maine, endofzero
-# dopeghoti, demonspork, robbiet480, sandain, orospakr, jdiamond
+# dopeghoti, demonspork, robbiet480, sandain, orospakr, jdiamond, FabianN
 # https://github.com/endofzero/Minecraft-Sheller
 
 # This is the path to where the location of the config.sh file resides.
@@ -46,6 +46,11 @@ MAP_CHANGES=1
 MCOVERVIEWER_PATH=$MC_PATH/Overviewer/
 MCOVERVIEWER_MAPS_PATH=/var/www/minecraft/maps/Overview/
 MCOVERVIEWER_OPTIONS="--rendermodes=lighting,night"
+
+PNG_OPTIMIZE=0
+OPTI_FIND_OPTIONS="-cmin 180"
+OPTIPNG_OPTIONS="-o4"
+ADVDEF_OPTIONS="-z4"
 
 # 	End of configuration
 [ -f $CONFIG_PATH/config.sh ] && source $CONFIG_PATH/config.sh
@@ -170,6 +175,13 @@ sync_offline() {
                         rm $MC_PATH/synclock
                         echo "Sync is complete"
         fi
+}
+
+pngoptimize (){
+	if [[ "$PNG_OPTIMIZE" == "1" && -n "$OPTI_DIR" ]]; then
+		find $OPTI_DIR -name "*.png" $OPTI_FIND_OPTIONS -exec optipng $OPTIPNG_OPTIONS {} \; -exec advdef $ADVDEF_OPTIONS {} \;
+		OPTI_DIR=
+	fi
 }
 
 if [[ $# -gt 0 ]]; then
@@ -449,6 +461,8 @@ if [[ $# -gt 0 ]]; then
                         			                rm -rf previous.png $RTMP.*
 							fi
 						fi
+						OPTI_DIR=$MAPS_PATH
+						pngoptimize
 					else
 						echo "The world \"$WORLD_NAME\" does not exist."
 					fi
@@ -496,6 +510,8 @@ if [[ $# -gt 0 ]]; then
 
 						echo "Minecraft-Overviewer in progress..."
 						python $MCOVERVIEWER_PATH/overviewer.py $MCOVERVIEWER_OPTIONS $MC_PATH/$OFFLINE_NAME $MCOVERVIEWER_MAPS_PATH
+						OPTI_DIR=$MCOVERVIEWER_MAPS_PATH
+						pngoptimize
 						echo "Minecraft-Overviewer is done."
 
 					else

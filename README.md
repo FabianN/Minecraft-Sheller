@@ -184,6 +184,18 @@ This is the location where Overviewer will render
     MCOVERVIEWER_OPTIONS="--rendermodes=lighting,night"
 This contains all of the options you want when running Overviewer.
 
+    PNG_OPTIMIZE=0
+Set this to 1 if you want the images to be compressed and optimized (using optipng & advdef). This will be applied to both Cartography and Overviewer map generations
+
+    OPTI_FIND_OPTIONS="-cmin 180"
+Additional paramiters to look for when collecting the images to be compressed. Currently set to compress any images that was modified in the last three hours.
+
+    OPTIPNG_OPTIONS="-O4"
+This contains all of the options you want when compressing images using optipng.
+
+    ADVDEF_OPTIONS="-z4"
+This contains all of the options you want when compressing images using advdef.
+
 ### Detailed Command Usage
 
 ##### ./minecraft.sh
