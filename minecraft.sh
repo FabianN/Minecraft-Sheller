@@ -40,6 +40,10 @@ LOGS_DAYS=14
 CARTO_PATH=$MC_PATH/carto
 MAPS_PATH=/var/www/minecraft/maps
 CARTO_OPTIONS="-q -s -m 4"
+CARTO_NIGHT=0
+CARTO_NIGHTOPTIONS="-q -s -m 4 -n"
+CARTO_CAVE=0
+CARTO_CAVEOPTIONS="-q -s -m 4 -c"
 BIOME_PATH=/home/minecraft/BiomeExtractor
 MAP_CHANGES=1
 
@@ -178,7 +182,7 @@ sync_offline() {
 }
 
 pngoptimize (){
-	if [[ "$PNG_OPTIMIZE" == "1" && -n "$OPTI_DIR" ]]; then
+	if [[ "$PNG_OPTIMIZE" == "1" && -n "$OPTI_DIR" ]]; then #Optimize images if it's set
 		find $OPTI_DIR -name "*.png" $OPTI_FIND_OPTIONS -exec optipng $OPTIPNG_OPTIONS {} \; -exec advdef $ADVDEF_OPTIONS {} \;
 		OPTI_DIR=
 	fi
@@ -439,12 +443,21 @@ if [[ $# -gt 0 ]]; then
 						cd $CARTO_PATH
 						echo "Cartography in progress..."
 						./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAME.png $CARTO_OPTIONS
-						mv *.png $MAPS_PATH
+						if [[ "$CARTO_NIGHT" == "1" ]]; then
+							FILENAMENIGHT=$WORLD_NAME-map-$DATE-night
+							./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAMENIGHT.png $CARTO_NIGHTOPTIONS
+						fi
+						if [[ "$CARTO_CAVE" == "1" ]]; then
+							FILENAMECAVE=$WORLD_NAME-map-$DATE-cave
+							./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAMECAVE.png $CARTO_CAVEOPTIONS
+						fi
+						mkdir $MAPS_PATH/$DATE
+						mv *.png $MAPS_PATH/$DATE
 						if [ 1 -eq $MAP_CHANGES ]; then
 			                                rm -f $MAPS_PATH/previous.png
                         			        ln $MAPS_PATH/current.png $MAPS_PATH/previous.png
                                 			rm -f $MAPS_PATH/current.png
-                                			ln $MAPS_PATH/$FILENAME.png $MAPS_PATH/current.png
+                                			ln $MAPS_PATH/$DATE/$FILENAME.png $MAPS_PATH/current.png
 						fi
 						cd $MC_PATH
 						echo "Cartography is done."
