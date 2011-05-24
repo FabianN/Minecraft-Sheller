@@ -457,6 +457,8 @@ if [[ $# -gt 0 ]]; then
 							FILENAMECAVE=$WORLD_NAME-map-$DATE-cave
 							./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAMECAVE.png $CARTO_CAVEOPTIONS
 						fi
+						OPTI_DIR=$CARTO_PATH
+						pngoptimize
 						mkdir $MAPS_PATH/$DATE
 						mv *.png $MAPS_PATH/$DATE
 						if [ 1 -eq $MAP_CHANGES ]; then
@@ -480,8 +482,6 @@ if [[ $# -gt 0 ]]; then
                         			                rm -rf previous.png $RTMP.*
 							fi
 						fi
-						OPTI_DIR=$MAPS_PATH
-						pngoptimize
 					else
 						echo "The world \"$WORLD_NAME\" does not exist."
 					fi
