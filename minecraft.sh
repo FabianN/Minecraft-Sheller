@@ -48,7 +48,7 @@ BIOME_PATH=/home/minecraft/BiomeExtractor
 MAP_CHANGES=1
 
 MCOVERVIEWER_PATH=$MC_PATH/Overviewer/
-MCOVERVIEWER_MAPS_PATH=/var/www/minecraft/maps/Overview/
+MCOVERVIEWER_MAPS_PATH=/var/www/minecraft/maps/Overview
 MCOVERVIEWER_OPTIONS="--rendermodes=lighting,night"
 
 PNG_OPTIMIZE=0
@@ -183,7 +183,13 @@ sync_offline() {
 
 pngoptimize (){
 	if [[ "$PNG_OPTIMIZE" == "1" && -n "$OPTI_DIR" ]]; then #Optimize images if it's set
-		find $OPTI_DIR -name "*.png" $OPTI_FIND_OPTIONS -exec optipng $OPTIPNG_OPTIONS {} \; -exec advdef $ADVDEF_OPTIONS {} \;
+# If there is the spawn or mineral dir it must be overviewer (and using transparent overlays). This doesn't play nice with optipng, so first optimizing the non-transparent png's with optipng, then going back over and optimize the spawn and mineral overlays using only advdef. If there are no signs of overlays, just go for the normal optimization.
+		if [[ -e "$OPTI_DIR/spawn" || -e "$OPTI_DIR/mineral" ]]; then
+			find $OPTI_DIR -name "*.png" -o -path '$OPTI_DIR/spawn' -prune -o -path '$OPTI_DIR/mineral' -prune -o $OPTI_FIND_OPTIONS -exec optipng $OPTIPNG_OPTIONS {} \; -exec advdef $ADVDEF_OPTIONS {} \;
+			find $OPTI_DIR -name "*.png" -o -path '$OPTI_DIR/lighting' -prune -o -path '$OPTI_DIR/night' -prune -o -path '$OPTI_DIR/cave' -prune -o $OPTI_FIND_OPTIONS -exec advdef $ADVDEF_OPTIONS {} \;
+		else
+			find $OPTI_DIR -name "*.png" -o $OPTI_FIND_OPTIONS -exec optipng $OPTIPNG_OPTIONS {} \; -exec advdef $ADVDEF_OPTIONS {} \;
+		fi
 		OPTI_DIR=
 	fi
 }
