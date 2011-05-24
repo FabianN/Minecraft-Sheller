@@ -88,14 +88,12 @@ if [ ! -e $WGET ]; then
         printf "sudo apt-get install wget\n"
         exit 1
 fi
-
 	if [[ -e $MC_PATH/server.log.lck ]]; then
 		#       ps -e | grep java | wc -l
 		ONLINE=1
 	else
 		ONLINE=0
 	fi
-
 #	Get the PID of our Java process for later use.  Better
 #	than just killing the lowest PID java process like the
 #	original verison did, but still non-optimal.
@@ -110,7 +108,6 @@ fi
 USERNAME=$(whoami)
 SCREEN_PID=$(screen -ls $SCREEN_NAME | $PERL -ne 'if ($_ =~ /^\t(\d+)\.$SCREEN_NAME.*$/) { print $1; }')
 #        echo "$SCREEN_PID $JAVA_PID"
-
 if [[ -z $SCREEN_PID ]]; then
 	#	Our server seems offline, because there's no screen running.
 	#	Set MC_PID to a null value.
@@ -441,9 +438,7 @@ if [[ $# -gt 0 ]]; then
 
 				if [[ -e $CARTO_PATH ]]; then
 					if [[ -e $MC_PATH/$WORLD_NAME ]]; then
-
 						mkdir -p $MAPS_PATH
-
 						DATE=$(date +%Y-%m-%d-%Hh%M)
 						FILENAME=$WORLD_NAME-map-$DATE
 						cd $CARTO_PATH
@@ -495,15 +490,12 @@ if [[ $# -gt 0 ]]; then
 		"biome")
 			if [[ -e $BIOME_PATH ]]; then
 				if [[ -e $MC_PATH/$WORLD_NAME ]]; then
-
 					if [[ "sync" == $2 ]]; then
 						sync_offline
 					fi
-
 					echo "Biome extraction in progress..."
 					java -jar $BIOME_PATH/MinecraftBiomeExtractor.jar -nogui $MC_PATH/$OFFLINE_NAME/
 					echo "Biome extraction is complete"
-
 				else
 					echo "The world \"$WORLD_NAME\" does not exist."
 				fi
@@ -517,22 +509,17 @@ if [[ $# -gt 0 ]]; then
 				echo "Previous overview run hasn't completed or has failed"
 			else
 				touch $MC_PATH/overviewlock
-
 				if [[ "sync" == $2 ]]; then
 					sync_offline
 				fi
-
 				if [[ -e $MCOVERVIEWER_PATH ]];  then
 					if [[ -e $MC_PATH/$WORLD_NAME ]]; then
-
 						mkdir -p $MCOVERVIEWER_MAPS_PATH
-
 						echo "Minecraft-Overviewer in progress..."
 						python $MCOVERVIEWER_PATH/overviewer.py $MCOVERVIEWER_OPTIONS $MC_PATH/$OFFLINE_NAME $MCOVERVIEWER_MAPS_PATH
 						OPTI_DIR=$MCOVERVIEWER_MAPS_PATH
 						pngoptimize
 						echo "Minecraft-Overviewer is done."
-
 					else
 						echo "The world \"$WORLD_NAME\" does not exist.";
 					fi
@@ -547,9 +534,7 @@ if [[ $# -gt 0 ]]; then
 			if [[ 1 -eq $ONLINE ]]; then
 				server_stop
 			fi
-
 			mkdir -p $BKUP_PATH
-
 			echo "Backing up current binaries..."
 			DATE=$(date +%Y-%m-%d)
 			cd $MC_PATH
@@ -560,7 +545,6 @@ if [[ $# -gt 0 ]]; then
 				tar -czf minecraft_server-$DATE.tar.gz minecraft_server.jar
 			fi
 			mv minecraft_server-$DATE.tar.gz $BKUP_PATH
-
 			echo "Downloading new binaries..."
 			wget -N http://www.minecraft.net/download/minecraft_server.jar
 			if [[ 1 -eq $SERVERMOD ]]; then
@@ -583,7 +567,6 @@ if [[ $# -gt 0 ]]; then
 					rm -rf ModTmp 
 				fi
 			fi
-
 			server_launch
 			if [[ 1 -eq $DISPLAY_ON_LAUNCH ]]; then
 				display
@@ -595,7 +578,6 @@ if [[ $# -gt 0 ]]; then
 			echo "backup [full] | sync [purge] | cartography [sync] | biome [sync] | overviewer [sync] | update>"
 			;;
 	esac
-
 else
 	if [[ 1 -eq $ONLINE ]]; then
 		display
