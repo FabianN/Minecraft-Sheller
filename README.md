@@ -169,6 +169,21 @@ This is the path to the world maps folder
     CARTO_OPTIONS="-q -s"
 This contains all of the options you want when running cartography.
 
+    CARTO_NIGHT=0
+Set this to 1 if you want a cartography night render.
+
+    CARTO_NIGHTOPTIONS="-q -s -m 4 -n"
+This contains all of the options you want when running cartography night render.
+
+    CARTO_CAVE=0
+Set this to 1 if you want a cartography cave render.
+
+    CARTO_CAVEOPTIONS="-q -s -m 4 -c"
+This contains all of the options you want when running cartography cave render.
+
+	DATE_DIR=0
+Set this to 1 if you want all of the cartography images to be placed in a folder of the date of their run (great when you have multiple renders of the same snapshot).
+
     MAP_CHANGES=1
 Set this to 1 if you want cartography to also create a 'changes.png' file that will show you what has changed since the last mapper, 0 will turn this feature off.
 
@@ -188,7 +203,7 @@ This contains all of the options you want when running Overviewer.
 Set this to 1 if you want the images to be compressed and optimized (using optipng & advdef). This will be applied to both Cartography and Overviewer map generations
 
     OPTI_FIND_OPTIONS="-cmin 180"
-Additional paramiters to look for when collecting the images to be compressed. Currently set to compress any images that was modified in the last three hours.
+Allows you to append additional parameters to look for when collecting the images to be compressed. Currently set to compress any images that was modified in the last three hours.
 
     OPTIPNG_OPTIONS="-O4"
 This contains all of the options you want when compressing images using optipng.
