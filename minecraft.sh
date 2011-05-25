@@ -41,9 +41,10 @@ CARTO_PATH=$MC_PATH/carto
 MAPS_PATH=/var/www/minecraft/maps
 CARTO_OPTIONS="-q -s -m 4"
 CARTO_NIGHT=0
-CARTO_NIGHTOPTIONS="-q -s -m 4 -n"
+CARTO_NIGHTOPTIONS="-q -s -m 4"
 CARTO_CAVE=0
-CARTO_CAVEOPTIONS="-q -s -m 4 -c"
+CARTO_CAVEOPTIONS="-q -s -m 4"
+DATE_DIR=0
 BIOME_PATH=/home/minecraft/BiomeExtractor
 MAP_CHANGES=1
 
@@ -64,6 +65,8 @@ JAVA=$(which java)
 PERL=$(which perl)
 SCREEN=$(which screen)
 WGET=$(which wget)
+OPTIPNG=$(which optipng)
+ADVDEF=$(which advdef)
 if [ ! -e $JAVA ]; then
         printf "Java not found!\n"
         printf "Try installing this with:\n"
@@ -87,6 +90,18 @@ if [ ! -e $WGET ]; then
         printf "Try installing this with:\n"
         printf "sudo apt-get install wget\n"
         exit 1
+fi
+if [[ ! -e "$OPTIPNG" && "PNG_OPTIMIZE" == "1" ]]; then
+        printf "Optipng not found!\n"
+        printf "Try installing this with:\n"
+        printf "sudo apt-get install optipng\n"
+        exit 1
+fi
+if [[ ! -e "$ADVDEF" && "PNG_OPTIMIZE" == "1" ]]; then
+        printf "ADVDEF not found!\n"
+        printf "Try installing this with:\n"
+        printf "sudo apt-get install advancecomp\n"
+        exit 1DATE_DIR
 fi
 	if [[ -e $MC_PATH/server.log.lck ]]; then
 		#       ps -e | grep java | wc -l
@@ -162,7 +177,7 @@ sync_offline() {
 
                         mkdir -p $MC_PATH/$OFFLINE_NAME/
                         rsync -a $MC_PATH/$WORLD_NAME/ $MC_PATH/$OFFLINE_NAME/
-                        WORLD_SIZE=$(du -s $MC_PATH/$WORLD_NAME/ | sed s/[[:space:]].*//g)
+                        WORLD_SIZE=$(du -s $MC_PATH/$WODATE_DIRRLD_NAME/ | sed s/[[:space:]].*//g)
                         OFFLINE_SIZE=$(du -s $MC_PATH/$OFFLINE_NAME/ | sed s/[[:space:]].*//g)
                         echo "WORLD  : $WORLD_SIZE KB"
                         echo "OFFLINE: $OFFLINE_SIZE KB"
@@ -180,7 +195,7 @@ sync_offline() {
 
 pngoptimize (){
 	if [[ "$PNG_OPTIMIZE" == "1" && -n "$OPTI_DIR" ]]; then #Optimize images if it's set
-# If there is the spawn or mineral dir it must be overviewer (and using transparent overlays). This doesn't play nice with optipng, so first optimizing the non-transparent png's with optipng, then going back over and optimize the spawn and mineral overlays using only advdef. If there are no signs of overlays, just go for the normal optimization.
+# If there is the spawn or mineral dir it must be overviewer (and using transparent overlays). This doesn't play nice with optipng, so first optimizing the non-transparent png's with optipng, then going back over and optimize the spawn and mineral overlays using only advdef. If there are no signs of overlays, just go for the full optimization.
 		if [[ -e "$OPTI_DIR/spawn" || -e "$OPTI_DIR/mineral" ]]; then
 			find $OPTI_DIR -name "*.png" -o -path '$OPTI_DIR/spawn' -prune -o -path '$OPTI_DIR/mineral' -prune -o $OPTI_FIND_OPTIONS -exec optipng $OPTIPNG_OPTIONS {} \; -exec advdef $ADVDEF_OPTIONS {} \;
 			find $OPTI_DIR -name "*.png" -o -path '$OPTI_DIR/lighting' -prune -o -path '$OPTI_DIR/night' -prune -o -path '$OPTI_DIR/cave' -prune -o $OPTI_FIND_OPTIONS -exec advdef $ADVDEF_OPTIONS {} \;
@@ -446,21 +461,30 @@ if [[ $# -gt 0 ]]; then
 						./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAME.png $CARTO_OPTIONS
 						if [[ "$CARTO_NIGHT" == "1" ]]; then
 							FILENAMENIGHT=$WORLD_NAME-map-$DATE-night
-							./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAMENIGHT.png $CARTO_NIGHTOPTIONS
+							./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAMENIGHT.png $CARTO_NIGHTOPTIONS -n
 						fi
 						if [[ "$CARTO_CAVE" == "1" ]]; then
 							FILENAMECAVE=$WORLD_NAME-map-$DATE-cave
-							./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAMECAVE.png $CARTO_CAVEOPTIONS
+							./c10t -w $MC_PATH/$OFFLINE_NAME/ -o $FILENAMECAVE.png $CARTO_CAVEOPTIONS -c
 						fi
 						OPTI_DIR=$CARTO_PATH
 						pngoptimize
-						mkdir $MAPS_PATH/$DATE
-						mv *.png $MAPS_PATH/$DATE
+						if [[ "$DATE_DIR" == "1" ]]; then
+							mkdir $MAPS_PATH/$DATE
+							mv *.png $MAPS_PATH/$DATE
+						else
+							mkdir $MAPS_PATH
+							mv *.png $MAPS_PATH
+						fi
 						if [ 1 -eq $MAP_CHANGES ]; then
 			                                rm -f $MAPS_PATH/previous.png
                         			        ln $MAPS_PATH/current.png $MAPS_PATH/previous.png
                                 			rm -f $MAPS_PATH/current.png
-                                			ln $MAPS_PATH/$DATE/$FILENAME.png $MAPS_PATH/current.png
+							if [[ "$DATE_DIR" == "1" ]]; then
+								ln $MAPS_PATH/$DATE/$FILENAME.png $MAPS_PATH/current.png
+							else
+								ln $MAPS_PATH/$FILENAME.png $MAPS_PATH/current.png
+							fi
 						fi
 						cd $MC_PATH
 						echo "Cartography is done."
