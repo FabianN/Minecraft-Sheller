@@ -495,9 +495,9 @@ if [[ $# -gt 0 ]]; then
 			                                        export RTMP=/tmp/makechanges.$$.
 			                                        compare previous.png current.png $RTMP.1.tga
                         			                convert -transparent white $RTMP.1.tga $RTMP.2.tga
-			                                        composite -quality 100 $RTMP.2.tga previous.png changes-$FILENAME.png
+			                                        composite -quality 100 $RTMP.2.tga previous.png changes/changes-$FILENAME.png
 								rm -f $MAPS_PATH/new.png
-			                                        ln changes-$FILENAME.png new.png
+			                                        ln changes/changes-$FILENAME.png new.png
                         			                rm -rf previous.png $RTMP.*
 							fi
 						fi
