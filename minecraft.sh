@@ -32,6 +32,10 @@ BKUP_DAYS_FULL=5
 BACKUP_FULL_LINK=${BKUP_PATH}/${WORLD_NAME}_full.tgz
 BACKUP_INCR_LINK=${BKUP_PATH}/${WORLD_NAME}_incr.tgz
 
+# Snapshots (for WorldEdit and other .zip based utilities)
+SNAP_PATH=$MC_PATH/snapshot
+SNAP_DAYS=4
+
 # Logs
 LOG_TDIR=/var/www/minecraft/logs
 LOGS_DAYS=14
@@ -601,9 +605,64 @@ if [[ $# -gt 0 ]]; then
 			fi
 			;;
 		#################################################################
+		"snapshot")
+			if [[ ! -d $SNAP_PATH  ]]; then
+				if ! mkdir -p $SNAP_PATH; then
+					echo "Snapshot path $SNAP_PATH does not exist and I could not create the directory!"
+					exit 1
+				fi
+			fi
+			if [[ -e $SNAP_PATH/$WORLD_NAME.lock ]]; then
+				echo "Snapshot already in progress.  Aborting."
+				exit 1
+			else
+				touch $SNAP_PATH/$WORLD_NAME.lock
+			fi
+
+			cd $SNAP_PATH
+
+			if [[ -e $MC_PATH/$WORLD_NAME ]]; then
+				if [[ $ONLINE -eq 1 ]]; then
+					echo "Server running, warning players : backup in 10s."
+					screen -S $SCREEN_NAME -p 0 -X stuff "$(printf "say Creating map snapshot in 10s\r")"
+					sleep 10
+					screen -S $SCREEN_NAME -p 0 -X stuff "$(printf "say Now backing up the map...\r")"
+					echo "Issuing save-all command, wait 5s..."
+					screen -S $SCREEN_NAME -p 0 -X stuff "$(printf "save-all\r")"
+					sleep 5
+					echo "Issuing save-off command..."
+					screen -S $SCREEN_NAME -p 0 -X stuff "$(printf "save-off\r")"
+					sleep 1
+				fi
+
+				cd $SNAP_PATH
+
+				DATE=$(date +%Y-%m-%d-%Hh%M)
+				FILENAME=$WORLD_NAME-$DATE
+
+				# Remove snapshots older than $SNAP_DAYS
+				find $SNAP_PATH/$WORLD_NAME-*.zip -type f -mtime +$SNAP_DAYS -print > purgelist
+				rm -f $(cat purgelist) purgelist
+
+				#Create snapshot file
+				zip -r -Z store $FILENAME $MC_PATH/$WORLD_NAME
+
+				if [[ 1 -eq $ONLINE ]]; then
+					echo "Issuing save-on command..."
+					screen -S $SCREEN_NAME -p 0 -X stuff "$(printf "save-on\r")"
+					sleep 1
+					screen -S $SCREEN_NAME -p 0 -X stuff "$(printf "say Creating map snapshot completed, have fun !\r")"
+				fi
+				echo "Backup process is over."
+			else
+				echo "The world \"$WORLD_NAME\" does not exist.";
+			fi
+			rm $SNAP_PATH/$WORLD_NAME.lock
+			;;
+		#################################################################
 		*)
 			echo "Usage : minecraft <status | start [force] | stop | restart [warn] | say 'message' | tell user 'message' | logs [clean]"
-			echo "backup [full] | sync [purge] | cartography [sync] | biome [sync] | overviewer [sync] | update>"
+			echo "backup [full] | sync [purge] | cartography [sync] | biome [sync] | overviewer [sync] | snapshot | update>"
 			;;
 	esac
 else
