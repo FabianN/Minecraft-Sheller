@@ -57,8 +57,8 @@ MCOVERVIEWER_MAPS_PATH=/var/www/minecraft/maps/Overview
 MCOVERVIEWER_OPTIONS="--rendermodes=lighting,night"
 
 PNG_OPTIMIZE=0
-OPTI_FIND_OPTIONS="-cmin 180"
-OPTIPNG_OPTIONS="-o4"
+OPTI_FIND_OPTIONS="-cmin +180"
+OPTIPNG_OPTIONS="-o3"
 ADVDEF_OPTIONS="-z4"
 
 # 	End of configuration

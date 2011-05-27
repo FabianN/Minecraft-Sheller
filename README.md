@@ -150,6 +150,14 @@ Naming convention for full backups.
     BACKUP_INCR_LINK=${BKUP_PATH}/${WORLD_NAME}_incr.tgz
 Naming convention for incremental backups.
 
+**Snapshots**
+
+	SNAP_PATH=$MC_PATH/snapshot
+This is the path to the snapsho folder. Snapshots that can be used by WorldEdit will go there.
+
+	SNAP_DAYS=4
+How long will snapshots be kept?
+
 **Logs**
 
     LOG_TDIR=/var/www/minecraftLogs
@@ -202,10 +210,10 @@ This contains all of the options you want when running Overviewer.
     PNG_OPTIMIZE=0
 Set this to 1 if you want the images to be compressed and optimized (using optipng & advdef). This will be applied to both Cartography and Overviewer map generations
 
-    OPTI_FIND_OPTIONS="-cmin 180"
+    OPTI_FIND_OPTIONS="-cmin +180"
 Allows you to append additional parameters to look for when collecting the images to be compressed. Currently set to compress any images that was modified in the last three hours.
 
-    OPTIPNG_OPTIONS="-O4"
+    OPTIPNG_OPTIONS="-o3"
 This contains all of the options you want when compressing images using optipng.
 
     ADVDEF_OPTIONS="-z4"
@@ -236,6 +244,10 @@ This is not an error and just a notification message. Logs are being generated c
 ##### ./minecraft.sh backup [full]
 Displays a message to the players if the server is online, stops the writing of chunks, create a dated archive and backs up the 
 world folder. If the full option is specified, it will delete the older incremental and full archives based on the settings.
+
+#### ./minecraft.sh snapshot
+Displays a message to the players if the server is online, stops the writing of chuncks, creates a dated zip archive and backs
+up the world folder. Designed around WorldEdit's Snapshot feature (http://wiki.sk89q.com/wiki/WorldEdit/Snapshots).
 
 #####./minecraft.sh say _message_
 If the server is online, this will send the <message> to all users via the console.
