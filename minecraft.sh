@@ -46,7 +46,7 @@ CARTO_CAVE=0
 CARTO_CAVEOPTIONS="-q -s -m 4"
 DATE_DIR=0
 BIOME_PATH=/home/minecraft/BiomeExtractor
-MAP_CHANGES=1
+MAP_CHANGES=0
 
 MCOVERVIEWER_PATH=$MC_PATH/Overviewer/
 MCOVERVIEWER_MAPS_PATH=/var/www/minecraft/maps/Overview
@@ -197,6 +197,7 @@ pngoptimize (){
 	if [[ "$PNG_OPTIMIZE" == "1" && -n "$OPTI_DIR" ]]; then #Optimize images if it's set
 # If there is the spawn or mineral dir it must be overviewer (and using transparent overlays). This doesn't play nice with optipng, so first optimizing the non-transparent png's with optipng, then going back over and optimize the spawn and mineral overlays using only advdef. If there are no signs of overlays, just go for the full optimization.
 		if [[ -e "$OPTI_DIR/spawn" || -e "$OPTI_DIR/mineral" ]]; then
+			echo "compressing images..."
 			find $OPTI_DIR -name "*.png" -o -path '$OPTI_DIR/spawn' -prune -o -path '$OPTI_DIR/mineral' -prune -o $OPTI_FIND_OPTIONS -exec optipng $OPTIPNG_OPTIONS {} \; -exec advdef $ADVDEF_OPTIONS {} \;
 			find $OPTI_DIR -name "*.png" -o -path '$OPTI_DIR/lighting' -prune -o -path '$OPTI_DIR/night' -prune -o -path '$OPTI_DIR/cave' -prune -o $OPTI_FIND_OPTIONS -exec advdef $ADVDEF_OPTIONS {} \;
 		else
@@ -497,6 +498,8 @@ if [[ $# -gt 0 ]]; then
 			                                        compare previous.png current.png $RTMP.1.tga
                         			                convert -transparent white $RTMP.1.tga $RTMP.2.tga
 			                                        composite -quality 100 $RTMP.2.tga previous.png changes/changes-$FILENAME.png
+								OPTI_DIR=$MAPS_PATH/changes
+								pngoptimize
 								rm -f $MAPS_PATH/new.png
 			                                        ln changes/changes-$FILENAME.png new.png
                         			                rm -rf previous.png $RTMP.*
