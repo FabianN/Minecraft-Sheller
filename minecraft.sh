@@ -91,13 +91,13 @@ if [ ! -e $WGET ]; then
         printf "sudo apt-get install wget\n"
         exit 1
 fi
-if [[ ! -e "$OPTIPNG" && "PNG_OPTIMIZE" == "1" ]]; then
+if [[ ! -e "$OPTIPNG" && "$PNG_OPTIMIZE" == "1" ]]; then
         printf "Optipng not found!\n"
         printf "Try installing this with:\n"
         printf "sudo apt-get install optipng\n"
         exit 1
 fi
-if [[ ! -e "$ADVDEF" && "PNG_OPTIMIZE" == "1" ]]; then
+if [[ ! -e "$ADVDEF" && "$PNG_OPTIMIZE" == "1" ]]; then
         printf "ADVDEF not found!\n"
         printf "Try installing this with:\n"
         printf "sudo apt-get install advancecomp\n"
